@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterar Senha</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/FCG.png" type="image/png">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/script_dinamico.js"></script> 
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Alterar Senha</h2>
+        <form action="{{ url_for('alterar_senha') }}" method="post" id="form-alterar-senha">
+            <div class="form-group">
+                <label for="nova_senha">Nova Senha</label>
+                <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmar_senha">Confirmar Senha</label>
+                <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                <div id="senha-feedback" class="invalid-feedback">As senhas não coincidem.</div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Alterar Senha</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn btn-link">Voltar</a>
+    </div>
+    <script>
+        document.getElementById('form-alterar-senha').addEventListener('submit', function(event) {
+            const novaSenha = document.getElementById('nova_senha').value;
+            const confirmarSenha = document.getElementById('confirmar_senha').value;
+            if (novaSenha !== confirmarSenha) {
+                event.preventDefault();
+                document.getElementById('confirmar_senha').classList.add('is-invalid');
+            } else {
+                document.getElementById('confirmar_senha').classList.remove('is-invalid');
+            }
+        });
+    </script>
+</body>
+</html>

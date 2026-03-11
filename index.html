@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Atletas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/FCG.png" type="image/png">
+</head>
+<body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/static/FCG.png" alt="Logo" style="height: 30px; margin-right: 10px;">
+                Gestão de Atletas
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        {% if current_user.is_admin %}
+                        <a href="{{ url_for('listar_usuarios') }}" class="btn btn-primary">
+                            <i class="fas fa-users"></i> Gerir Utilizadores
+                        </a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('alterar_senha') }}" class="nav-link">
+                            <i class="fas fa-key mr-1"></i>Alterar Senha
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('historico_pagamentos') }}" class="nav-link">
+                            <i class="fas fa-history mr-1"></i>Histórico
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <div class="card mb-4 fade-in">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-plus-circle mr-2"></i>Adicionar Novo Atleta</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('adicionar_atleta') }}" method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="fas fa-user mr-1"></i>Nome</label>
+                                <input type="text" name="nome" class="form-control" required 
+                                       pattern="[A-Za-zÀ-ÿ\s]+" title="Apenas letras e espaços são permitidos">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar mr-1"></i>Data de Nascimento</label>
+                                <input type="text" name="data_nascimento" class="form-control" 
+                                       placeholder="DD/MM/AAAA" required 
+                                       pattern="\d{2}/\d{2}/\d{4}" title="Formato: DD/MM/AAAA">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus mr-1"></i>Adicionar Atleta
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card fade-in">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list mr-2"></i>Lista de Atletas</h5>
+            </div>
+            <div class="card-body">
+                
+                <div class="mb-4 text-center">
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-todos active" data-escalao="todos">
+                        <i class="fas fa-shield-alt mr-1"></i>Todos <span class="contador">{{ atletas|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Petizes" data-escalao="Petizes">
+                        Petizes <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Petizes')|list|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Traquinas" data-escalao="Traquinas">
+                        Traquinas <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Traquinas')|list|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Benjamins" data-escalao="Benjamins">
+                        Benjamins <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Benjamins')|list|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Infantis" data-escalao="Infantis">
+                        Infantis <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Infantis')|list|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Iniciados" data-escalao="Iniciados">
+                        Iniciados <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Iniciados')|list|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Juvenis" data-escalao="Juvenis">
+                        Juvenis <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Juvenis')|list|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Juniores" data-escalao="Juniores">
+                        Juniores <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Juniores')|list|length }}</span>
+                    </button>
+                    <button class="btn mb-2 mr-2 escalao-badge escalao-Séniores" data-escalao="Séniores">
+                        Séniores <span class="contador">{{ atletas|selectattr('4', 'equalto', 'Séniores')|list|length }}</span>
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user mr-1"></i>Nome</th>
+                                <th><i class="fas fa-user-clock mr-1"></i>Idade</th>
+                                <th><i class="fas fa-layer-group mr-1"></i>Escalão</th>
+                                <th><i class="fas fa-money-bill-wave mr-1"></i>Status</th>
+                                <th><i class="fas fa-cogs mr-1"></i>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for atleta in atletas %}
+                            <tr>
+                                <td>{{ atleta[1] }}</td>
+                                <td>{{ atleta[3] }}</td>
+                                <td>
+                                    <span class="escalao-badge escalao-{{ atleta[4] }}">{{ atleta[4] }}</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge 
+                                        {% if atleta[5] == 'Pago' %}status-pago
+                                        {% elif atleta[5] == 'Não aplicável' %}status-isento
+                                        {% else %}status-pendente{% endif %}">
+                                        {{ atleta[5] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if atleta[4] != 'Séniores' %}
+                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalPagamento{{ atleta[0] }}">
+                                            <i class="fas fa-euro-sign mr-1"></i>Registar Pagamento
+                                        </button>
+                                        
+                                        <div class="modal fade" id="modalPagamento{{ atleta[0] }}" tabindex="-1">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Pagamento - {{ atleta[1] }}</h5>
+                                                        <button type="button" class="close" data-dismiss="modal">
+                                                            <span>&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <form action="{{ url_for('atualizar_pagamento', atleta_id=atleta[0]) }}" method="post">
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label><i class="fas fa-exclamation-circle mr-1"></i>Meses em Atraso</label>
+                                                                        <div class="meses-container meses-atraso">
+                                                                            {% set meses_atraso = obter_meses_atraso(atleta[0]) %}
+                                                                            {% if meses_atraso %}
+                                                                                {% for mes in meses_atraso %}
+                                                                                <div class="custom-control custom-checkbox">
+                                                                                    <input type="checkbox" class="custom-control-input mes-checkbox" 
+                                                                                           id="mesAtraso{{ atleta[0] }}{{ mes.split('/')[0] }}{{ mes.split('/')[1] }}" 
+                                                                                           name="meses" value="{{ mes }}"
+                                                                                           data-valor="25">
+                                                                                    <label class="custom-control-label" 
+                                                                                           for="mesAtraso{{ atleta[0] }}{{ mes.split('/')[0] }}{{ mes.split('/')[1] }}">
+                                                                                        {{ get_nome_mes(mes.split('/')[0]) }}/{{ mes.split('/')[1] }} - 25€
+                                                                                        <span class="badge badge-danger">Em atraso</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                {% endfor %}
+                                                                            {% else %}
+                                                                                <p class="text-muted">Não há meses em atraso</p>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label><i class="fas fa-calendar-alt mr-1"></i>Próximos Meses</label>
+                                                                        <div class="meses-container meses-futuros">
+                                                                            {% set meses_futuros = obter_meses_futuros(atleta[0]) %}
+                                                                            {% if meses_futuros %}
+                                                                                {% for mes in meses_futuros %}
+                                                                                <div class="custom-control custom-checkbox">
+                                                                                    <input type="checkbox" class="custom-control-input mes-checkbox" 
+                                                                                           id="mesFuturo{{ atleta[0] }}{{ mes.split('/')[0] }}{{ mes.split('/')[1] }}" 
+                                                                                           name="meses" value="{{ mes }}"
+                                                                                           data-valor="25">
+                                                                                    <label class="custom-control-label" 
+                                                                                           for="mesFuturo{{ atleta[0] }}{{ mes.split('/')[0] }}{{ mes.split('/')[1] }}">
+                                                                                        {{ get_nome_mes(mes.split('/')[0]) }}/{{ mes.split('/')[1] }} - 25€
+                                                                                    </label>
+                                                                                </div>
+                                                                                {% endfor %}
+                                                                            {% else %}
+                                                                                <p class="text-muted">Não há meses futuros disponíveis</p>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group mt-3">
+                                                                <label><i class="fas fa-euro-sign mr-1"></i>Valor Total:</label>
+                                                                <input type="text" class="form-control" id="valorTotal{{ atleta[0] }}" 
+                                                                       name="valor_total" readonly value="0€">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-primary">Confirmar Pagamento</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted"><i class="fas fa-user-shield mr-1"></i>Sénior (Isento)</span>
+                                    {% endif %}
+                                    <a href="{{ url_for('remover_atleta', id=atleta[0]) }}" class="btn btn-danger btn-sm ml-1">
+                                        <i class="fas fa-trash mr-1"></i>Remover
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                        <i class="fas fa-info-circle mr-2"></i>{{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+   
+    const botoesEscalao = document.querySelectorAll('[data-escalao]');
+    const linhasAtletas = document.querySelectorAll('tbody tr');
+
+    botoesEscalao.forEach(botao => {
+        botao.addEventListener('click', function () {
+            botoesEscalao.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const escalaoSelecionado = this.getAttribute('data-escalao');
+
+            linhasAtletas.forEach(linha => {
+                const escalaoAtleta = linha.querySelector('.escalao-badge').textContent;
+                linha.style.display = (escalaoSelecionado === 'todos' || escalaoAtleta === escalaoSelecionado) ? '' : 'none';
+            });
+        });
+    });
+
+    
+    const checkboxes = document.querySelectorAll('.mes-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+           
+            const modalId = this.closest('.modal').id.replace('modalPagamento', '');
+
+            
+            const checkboxesSelecionados = document.querySelectorAll(`#modalPagamento${modalId} .mes-checkbox:checked`);
+
+           
+            const valorTotal = Array.from(checkboxesSelecionados).reduce((total, checkbox) => {
+                const valor = parseInt(checkbox.getAttribute('data-valor'), 10) || 0;
+                return total + valor;
+            }, 0);
+
+           
+            const valorTotalInput = document.getElementById('valorTotal' + modalId);
+            valorTotalInput.value = `${valorTotal}€`;
+        });
+    });
+});
+
+        </script>
+    </body>
+    </html>
